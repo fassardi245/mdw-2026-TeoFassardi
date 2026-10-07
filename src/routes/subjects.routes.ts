@@ -10,12 +10,16 @@ import {
 import { validateBody } from "../middlewares/validate";
 import { createSubjectSchema, listSubjectsSchema, updateSubjectSchema } from "../schemas/subject.schema";
 
-const router = Router();
+import { authMiddleware } from '../middlewares/auth.middleware';
+import { requireRole } from '../middlewares/role.middleware';
 
-router.query!("/", validateBody(listSubjectsSchema), listSubjects);
+const router = Router();
+router.use(authMiddleware);
+
+router.post("/search", validateBody(listSubjectsSchema), listSubjects);
 router.get("/:id", getSubjectById);
-router.post("/", validateBody(createSubjectSchema), createSubject);
-router.put("/:id", validateBody(updateSubjectSchema), updateSubject);
-router.delete("/:id", deleteSubject);
+router.post("/", requireRole("ADMIN"), validateBody(createSubjectSchema), createSubject);
+router.put("/:id", requireRole("ADMIN"), validateBody(updateSubjectSchema), updateSubject);
+router.delete("/:id", requireRole("ADMIN"), deleteSubject);
 
 export default router;

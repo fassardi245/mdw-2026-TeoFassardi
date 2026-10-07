@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import "dotenv/config";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import path from "node:path";
 import v1Router from "./routes";
 import { connectMongoDB } from "./config/db";
 
@@ -13,6 +14,7 @@ const NODE_ENV: Environment = (process.env.NODE_ENV as Environment) ?? "developm
 app.use(cors({ origin: process.env.CORS_ORIGIN ?? "http://localhost:5173", credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, "../frontend")));
 
 app.use("/api/v1", v1Router);
 

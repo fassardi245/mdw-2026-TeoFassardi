@@ -10,12 +10,16 @@ import {
 import { validateBody } from "../middlewares/validate";
 import { createStudentSchema, listStudentsSchema, updateStudentSchema } from "../schemas/student.schema";
 
-const router = Router();
+import { authMiddleware } from '../middlewares/auth.middleware';
+import { requireRole } from '../middlewares/role.middleware';
 
-router.query!("/", validateBody(listStudentsSchema), listStudents);
+const router = Router();
+router.use(authMiddleware);
+
+router.post("/search", validateBody(listStudentsSchema), listStudents);
 router.get("/:id", getStudentById);
-router.post("/", validateBody(createStudentSchema), createStudent);
-router.put("/:id", validateBody(updateStudentSchema), updateStudent);
-router.delete("/:id", deleteStudent);
+router.post("/", requireRole("ADMIN"), validateBody(createStudentSchema), createStudent);
+router.put("/:id", requireRole("ADMIN"), validateBody(updateStudentSchema), updateStudent);
+router.delete("/:id", requireRole("ADMIN"), deleteStudent);
 
 export default router;
