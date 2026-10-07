@@ -1,0 +1,22 @@
+// Mapping between (HTTP method + path) and controller. No business logic here.
+import { Router } from "express";
+import {
+  listStudents,
+  getStudentById,
+  createStudent,
+  updateStudent,
+  deleteStudent,
+} from "../controllers/students.controller";
+import { validateBody } from "../middlewares/validate";
+import { createStudentSchema, listStudentsSchema, updateStudentSchema } from "../schemas/student.schema";
+import { authMiddleware, requireRole } from "../middlewares/auth.middleware";
+
+const router = Router();
+
+router.query!("/", validateBody(listStudentsSchema), listStudents);
+router.get("/:id", getStudentById);
+router.post("/", authMiddleware, requireRole("ADMIN"), validateBody(createStudentSchema), createStudent);
+router.put("/:id", authMiddleware, requireRole("ADMIN"), validateBody(updateStudentSchema), updateStudent);
+router.delete("/:id", authMiddleware, requireRole("ADMIN"), deleteStudent);
+
+export default router;
